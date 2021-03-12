@@ -2,24 +2,28 @@ const express = require('express');
 const models = require('./models');
 const expressGraphQL = require('express-graphql');
 const mongoose = require('mongoose');
-const session = require('express-session');
+// const session = require('express-session');
 const passport = require('passport');
 const passportConfig = require('./services/auth');
-const MongoStore = require('connect-mongo')(session);
+// const MongoStore = require('connect-mongo')(session);
 const schema = require('./schema/schema');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
 
 // Create a new Express application
 const app = express();
 
 // Replace with your mongoLab URI
-const MONGO_URI = '';
+const MONGO_URI = 'mongodb+srv://user_1:kMjGqqxEpUrU09Rz@cluster0.5qnoz.mongodb.net/auth?retryWrites=true&w=majority';;
 
 // Mongoose's built in promise library is deprecated, replace it with ES2015 Promise
 mongoose.Promise = global.Promise;
 
 // Connect to the mongoDB instance and log a message
 // on success or failure
-mongoose.connect(MONGO_URI);
+mongoose.connect(MONGO_URI, {
+  useNewUrlParser: true
+});
 mongoose.connection
     .once('open', () => console.log('Connected to MongoLab instance.'))
     .on('error', error => console.log('Error connecting to MongoLab:', error));
@@ -33,9 +37,12 @@ app.use(session({
   resave: true,
   saveUninitialized: true,
   secret: 'aaabbbccc',
-  store: new MongoStore({
-    url: MONGO_URI,
-    autoReconnect: true
+  // store: new MongoStore({
+  //   url: MONGO_URI,
+  //   // autoReconnect: true
+  // })
+  store: MongoStore.create({
+    mongoUrl: MONGO_URI
   })
 }));
 
